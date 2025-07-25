@@ -79,7 +79,7 @@ export default function Home() {
             <button className=" hover:scale-105 hover:shadow-xl hover:bg-blue-700 bg-yellow-700 rounded-md items-center  text-white p-2  w-40 ml-40 mt-5 shadow-md inline-flex ">Category  <MoveRight size={24} className="text-white ml-10"/></button>
       
         </div>
-
+      
    </div>
    </>
   )
