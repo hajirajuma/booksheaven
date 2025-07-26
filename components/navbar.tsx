@@ -9,12 +9,12 @@ export const Navbar = () => {
   return (
     <nav className="flex items-center justify-between p-4 sticky top-0 bg-white text-yellow-700 font-bold shadow-md z-50">
       <div className="text-lg font-bold">
-        <Link href="/" className="hover:text-blue-600 flex items-center gap-1">
+        <Link href="/" className="hover:text-blue-600  flex items-center gap-1">
           <BookOpen size={24} />
-          <span className="text-yellow-600">Book</span>
+          <span className="text-yellow-700">Book</span>
           <span className="text-blue-700">Heaven</span>
         </Link>  
-      </div>
+      </div>   
       
       <div className="flex items-center">
         <button 
@@ -26,7 +26,7 @@ export const Navbar = () => {
         </button>
         
         {/* Desktop menu */}
-        <ul className="hidden md:flex space-x-6">
+        <ul className="hidden md:flex space-x-6 ">
           <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
           <li><Link href="/shop" className="hover:text-blue-600 transition-colors">Shop</Link></li>
           <li><Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link></li>
@@ -37,7 +37,7 @@ export const Navbar = () => {
       
       {/* Mobile menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 md:hidden px-4 pb-4 space-y-2 bg-white shadow-md flex flex-col">
+        <div className="absolute top-full left-0 right-0 md:hidden px-4 pb-4 space-y-2 bg-white flex flex-col mt-0 ml-auto  shadow-lg  text-center w-3/7">
           <Link href="/" className="hover:text-blue-600 transition-colors py-2">Home</Link>
           <Link href="/shop" className="hover:text-blue-600 transition-colors py-2">Shop</Link>
           <Link href="/categories" className="hover:text-blue-600 transition-colors py-2">Categories</Link>
