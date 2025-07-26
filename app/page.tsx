@@ -66,7 +66,7 @@ export default function Home() {
       <div 
         className="relative bg-gradient-to-br bg-cover bg-center min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] flex items-center justify-center"
         style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/book1.jpg')"
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/read.jpg')"
         }}
       >
         <div className="text-center py-8 md:py-16 lg:py-20 px-4 max-w-4xl mx-auto">
@@ -74,7 +74,7 @@ export default function Home() {
             Welcome To
           </h2>
           <h1 className="text-4xl md:text-6xl lg:text-7xl text-yellow-700 font-bold mb-4 md:mb-6 tracking-tight">
-            BookHeaven
+             BookHeaven
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-white font-light">
             Your Gateway To Knowledge

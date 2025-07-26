@@ -29,7 +29,7 @@ export const Navbar = () => {
         <ul className="hidden md:flex space-x-6 ">
           <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
           <li><Link href="/shop" className="hover:text-blue-600 transition-colors">Shop</Link></li>
-          <li><Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link></li>
+          <li><Link href="/categories" className="hover:text-blue-600 transition-colors">Category</Link></li>
           <li><Link href="/cart" className="hover:text-blue-600 transition-colors">Cart</Link></li>
           <li><Link href="/Admin" className="hover:text-blue-600 transition-colors">Admin</Link></li>
         </ul>

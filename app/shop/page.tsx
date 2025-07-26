@@ -1,68 +1,62 @@
-import stat from "../public/books/stat.jpg";
-import line from "../public/books/line.jpg";
-import java from "../public/books/java.jpg";
-import phy from "../public/books/phy.jpg";
-import atom from "../public/books/atom.jpg";
-import data1 from "../public/books/data1.jpg";
 import Image from "next/image";
 import { MoveRight, Search } from "lucide-react";
 
-export default function Home() {
+export default function ShopPage () {
   
   const books = [
     {
       id: 1,
       title: "Data Analysis using SQL and Excel",
       author: "Gordon S.Linoff",
-      price : "k40000/$4.5",
       publisher: "Wiley Publishing",
-      image: data1,
+      price: "K40000/$4.5",
+      image: "/books/data1.jpg",
       pdfUrl: "/books/data.pdf"
     },
     {
       id: 2,
       title: "JavaScript: The Complete Guide",
       author: "David Flanagan",
-      price:  "k30000/$3.8",
       publisher: "O'Reilly Media",
-      image: atom,
-      pdfUrl: "/books/data.pdf"
+      price: "K30000/$3.8",
+      image: "/books/atom.jpg",
+      pdfUrl: "/books/javascript.pdf"
     },
     {
       id: 3,
       title: "Linear Algebra and Its Applications",
       author: "David C. Lay",
-      price : "k50000/$6.4",
       publisher: "Pearson",
-      image: java,
-      pdfUrl: "/books/data.pdf"
+      price: "K50000/$6.4",
+      image: "/books/java.jpg",
+      pdfUrl: "/books/linear.pdf"
     },
     {
       id: 4,
       title: "Physics: Principles and Problems",
       author: "Paul W. Zitzewitz",
-      price : "K39000/$2.5",
       publisher: "McGraw-Hill",
-      image: phy,
-      pdfUrl: "/books/data.pdf"
+      price: "K45000/$5.7",
+      image: "/books/phy.jpg",
+      pdfUrl: "/books/physics.pdf"
     },
     {
       id: 5,
       title: "Java Programming Fundamentals",
       author: "Oracle Press",
-      price : "k45000/$5.5",
       publisher: "McGraw-Hill",
-      image: line,
-      pdfUrl: "/books/data.pdf"
+      price: "K35000/$4.4",
+      image: "/books/line.jpg",
+      pdfUrl: "/books/java.pdf"
     },
     {
       id: 6,
       title: "Atomic Structure and Chemical Bonding",
       author: "Linus Pauling",
-      price : "k55000/$6.7",
       publisher: "Academic Press",
-      image: stat,
-      pdfUrl: "/books/data.pdf"
+      price: "K25000/$3.2",
+      image: "/books/stat.jpg",
+      pdfUrl: "/books/atom.pdf"
     }
   ];
 
@@ -72,18 +66,18 @@ export default function Home() {
       <div 
         className="relative bg-gradient-to-br bg-cover bg-center min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] flex items-center justify-center"
         style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/read.jpg')"
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/open.jpg')"
         }}
       >
         <div className="text-center py-8 md:py-16 lg:py-20 px-4 max-w-4xl mx-auto">
           <h2 className="text-white text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-wide">
-            Welcome To
+           Read Clearly
           </h2>
           <h1 className="text-4xl md:text-6xl lg:text-7xl text-yellow-700 font-bold mb-4 md:mb-6 tracking-tight">
-            BookHeaven
+            And 
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-white font-light">
-            Your Gateway To Knowledge
+            Change Your Mindset
           </p>
         </div>
       </div>
@@ -142,10 +136,10 @@ export default function Home() {
                     <span className="font-medium">Author:</span> {book.author}
                   </p>
                   <p className="text-gray-600 text-xs md:text-sm">
-                    <span className="font-medium">Price:</span> {book.price}
-                  </p>
-                  <p className="text-gray-600 text-xs md:text-sm">
                     <span className="font-medium">Publisher:</span> {book.publisher}
+                  </p>
+                  <p className="text-gray-600 font-bold text-sm md:text-base">
+                    {book.price}
                   </p>
                 </div>
               </div>
@@ -155,7 +149,7 @@ export default function Home() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
-              Shop
+              Add to Cart
             </button>
             
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
@@ -168,4 +162,3 @@ export default function Home() {
     </div>
   );
 }
-  
