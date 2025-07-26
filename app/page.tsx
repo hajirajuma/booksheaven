@@ -5,7 +5,7 @@ import phy from "../public/books/phy.jpg";
 import atom from "../public/books/atom.jpg";
 import data1 from "../public/books/data1.jpg";
 import Image from "next/image";
-import { MoveRight, Search } from "lucide-react";
+import { MoveRight } from "lucide-react";
 
 export default function Home() {
   
@@ -24,7 +24,7 @@ export default function Home() {
       author: "David Flanagan",
       publisher: "O'Reilly Media",
       image: atom,
-      pdfUrl: "/books/javascript.pdf"
+      pdfUrl: "/books/data.pdf"
     },
     {
       id: 3,
@@ -32,7 +32,7 @@ export default function Home() {
       author: "David C. Lay",
       publisher: "Pearson",
       image: java,
-      pdfUrl: "/books/linear.pdf"
+      pdfUrl: "/books/data.pdf"
     },
     {
       id: 4,
@@ -40,7 +40,7 @@ export default function Home() {
       author: "Paul W. Zitzewitz",
       publisher: "McGraw-Hill",
       image: phy,
-      pdfUrl: "/books/physics.pdf"
+      pdfUrl: "/books/data.pdf"
     },
     {
       id: 5,
@@ -48,7 +48,7 @@ export default function Home() {
       author: "Oracle Press",
       publisher: "McGraw-Hill",
       image: line,
-      pdfUrl: "/books/java.pdf"
+      pdfUrl: "/books/data.pdf"
     },
     {
       id: 6,
@@ -56,7 +56,7 @@ export default function Home() {
       author: "Linus Pauling",
       publisher: "Academic Press",
       image: stat,
-      pdfUrl: "/books/atom.pdf"
+      pdfUrl: "/books/data.pdf"
     }
   ];
 
@@ -87,10 +87,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Title */}
           <h2 className="text-center py-12 md:py-16 lg:py-20 text-3xl md:text-4xl lg:text-5xl text-yellow-700 font-bold tracking-wide">
-            My Library
+           Featured Books
           </h2>
 
-          {/* Search Bar */}
+          {/* Search Bar 
           <div className="flex justify-center items-center mb-12 md:mb-16 lg:mb-20">
             <div className="relative w-full max-w-md">
               <input 
@@ -102,7 +102,7 @@ export default function Home() {
                 <Search size={20} />
               </button>
             </div>
-          </div>
+          </div>*/}
 
           {/* Books Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
@@ -146,7 +146,7 @@ export default function Home() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
-              Add to Cart
+              Browse 
             </button>
             
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
