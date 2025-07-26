@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image";
 import { MoveRight, Search } from "lucide-react";
     
-export default function CategoryPage() {
+export default function CategoriesPage () {
   
   const books = [
     {
@@ -65,14 +65,14 @@ export default function CategoryPage() {
     <div className="min-h-screen bg-gray-50">
       
       {/* Category Buttons at the top */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <ul className="flex items-center gap-4 flex-wrap">
+      <div className="bg-white shadow-sm border-b items-center">
+        <div className="max-w-7xl ml-55 px-4 sm:px-6 lg:px-8 py-4">
+          <ul className="flex items-center gap-12 flex-wrap">
             <li><Button variant="outline">Education</Button></li>
             <li><Button variant="outline">Romance</Button></li>
             <li><Button variant="outline">History</Button></li>
             <li><Button variant="outline">Technology</Button></li>
-            <li className="px-3 py-2 text-gray-700 font-medium">Life</li>
+            <li><Button variant="outline">Life</Button></li>
           </ul>
         </div>
       </div>
@@ -80,17 +80,13 @@ export default function CategoryPage() {
       {/* Library Section */}
       <div className="bg-white shadow-lg w-full min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Title */}
-          <h2 className="text-center py-12 md:py-16 lg:py-20 text-3xl md:text-4xl lg:text-5xl text-yellow-700 font-bold tracking-wide">
-            My Library
-          </h2>
-
-          {/* Search Bar */}
-          <div className="flex justify-center items-center mb-12 md:mb-16 lg:mb-20">
+          
+        {/* Search Bar */}
+          <div className="flex justify-center items-center  mb-12 md:mb-16 lg:mb-20">
             <div className="relative w-full max-w-md">
               <input 
                 type="text" 
-                placeholder="Search books..." 
+                placeholder="Search by genres,author,title..." 
                 className="w-full p-3 md:p-4 pr-12 border-2 border-yellow-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-700 placeholder-gray-500"
               />
               <button className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-700 hover:text-yellow-800 transition-colors">
@@ -99,7 +95,7 @@ export default function CategoryPage() {
             </div>
           </div>
 
-          {/* Books List - Vertical Layout */}
+          {/* Books List - Vertical Layout with Details on Left */}
           <div className="space-y-6 mb-16">
             {books.map((book) => (
               <div 
@@ -127,8 +123,11 @@ export default function CategoryPage() {
                     </a>
                   </div>
                   
-                  {/* Book Details - Right side */}
-                  <div className="flex-1 space-y-3">
+                  {/* Spacer */}
+                  <div className="flex-1"></div>
+                  
+                  {/* Book Details - Right side near margin */}
+                  <div className="flex-shrink-0 w-full md:w-80 space-y-3">
                     <h3 className="text-gray-900 font-semibold text-lg md:text-xl leading-tight">
                       {book.title}
                     </h3>
@@ -148,11 +147,11 @@ export default function CategoryPage() {
                         href={book.pdfUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="bg-yellow-700 hover:bg-yellow-800 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm"
+                        className="bg-yellow-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm"
                       >
                         View PDF
                       </a>
-                      <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm">
+                      <button className="bg-yellow-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm">
                         Add to Cart
                       </button>
                     </div>
