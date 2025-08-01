@@ -4,8 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+// Define the Book interface
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  publisher: string;
+  price: number;
+  displayPrice: string;
+  image: string;
+  pdfUrl: string;
+}
+
 export default function ShopPage() {
-  const books = [
+  const books: Book[] = [
     {
       id: 1,
       title: "Data Analysis using SQL and Excel",
@@ -39,30 +51,32 @@ export default function ShopPage() {
   ];
 
   // State for cart items and quantities
-  const [cartItems, setCartItems] = useState(books);
-  const [bookQuantities, setBookQuantities] = useState(
+  const [cartItems, setCartItems] = useState<Book[]>(books);
+  const [bookQuantities, setBookQuantities] = useState<Record<number, number>>(
     books.reduce((acc, book) => ({ ...acc, [book.id]: 1 }), {})
   );
 
-  const updateQuantity = (bookId, newQuantity) => {
+  // Fixed: Changed bookId type from string to number to match the actual book.id type
+  const updateQuantity = (bookId: number, newQuantity: number) => {
     setBookQuantities(prev => ({
       ...prev,
       [bookId]: Math.max(1, newQuantity)
     }));
   };
 
-  const calculateTotal = (book) => {
+  // Fixed: Added proper type annotation for book parameter
+  const calculateTotal = (book: Book): number => {
     return book.price * bookQuantities[book.id];
   };
 
-  const calculateCartTotal = () => {
+  const calculateCartTotal = (): number => {
     return cartItems.reduce((total, book) => {
       return total + calculateTotal(book);
     }, 0);
   };
 
-  // Remove function
-  const remove = (bookId) => {
+  // Fixed: Added proper type annotation for bookId parameter
+  const remove = (bookId: number): void => {
     setCartItems(prev => prev.filter(book => book.id !== bookId));
     setBookQuantities(prev => {
       const newQuantities = { ...prev };
