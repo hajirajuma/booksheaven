@@ -36,9 +36,9 @@ export default function AdminPage() {
         <div className="bg-white shadow-sm border-b rounded-lg">
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <ul className="flex items-center ml-96 gap-15 flex-wrap">
-              <li><Button variant="outline">Add new book</Button></li>
-              <li><Button variant="outline">View inventory</Button></li>
-              <li><Button variant="outline">View orders</Button></li>
+              <li><Button variant="outline" className="bg-gray-900 text-white">Add new book</Button></li>
+              <li><Button variant="outline" className="bg-gray-900 text-white">View inventory</Button></li>
+              <li><Button variant="outline" className="bg-gray-900 text-white">View orders</Button></li>
             </ul>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function AdminPage() {
                       <Button variant="ghost" className="mr-2">Edit</Button>
                       <Button 
                         variant="destructive"
-                        onClick={() => handleDeleteBook(book.id)}
+                        onClick={() => handleDeleteBook(book.id)} className="bg-gray-900"
                       >
                         Delete
                       </Button>

@@ -72,9 +72,11 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl md:text-6xl lg:text-7xl text-center text-yellow-700 font-bold mb-4 md:mb-6 tracking-tight">
-        <span className="text-blue-700">Your </span>Cart
+    
+    <div className="container mx-auto px-4 py-8 ">
+      
+      <h1 className="text-3xl md:text-6xl lg:text-7xl text-center text-gray-900 font-semibold mb-4 md:mb-6 tracking-tight">
+      Your Cart
       </h1>
 
       {/* Books Grid */}
@@ -138,7 +140,7 @@ export default function ShopPage() {
 
             <button 
               onClick={() => remove(book.id)} 
-              className="bg-yellow-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm w-full"
+              className="bg-gray-900 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm w-full"
             >
               Remove
             </button>
@@ -171,7 +173,7 @@ export default function ShopPage() {
           </div>
           <Link href= "/payment">
           <button 
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="w-full bg-gray-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             aria-label="Proceed to checkout"
             onClick={() => console.log('Proceeding to checkout...')}
           >

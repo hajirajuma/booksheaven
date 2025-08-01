@@ -31,7 +31,7 @@ export const Navbar = () => {
           <li><Link href="/shop" className="hover:text-blue-600 transition-colors">Shop</Link></li>
           <li><Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link></li>
           <li><Link href="/cart" className="hover:text-blue-600 transition-colors">Cart</Link></li>
-          <li><Link href="/Admin" className="hover:text-blue-600 transition-colors">Admin</Link></li>
+          <li><Link href="/admin" className="hover:text-blue-600 transition-colors">Admin</Link></li>
         </ul>
       </div>
       
