@@ -65,7 +65,7 @@ export default function CategoriesPage () {
     <div className="min-h-screen bg-gray-50">
       
       {/* Category Buttons at the top */}
-      <div className="bg-gray-900 shadow-sm border-b items-center">
+      <div className="shadow-sm border-b items-center">
         <div className="max-w-7xl ml-55 px-4 sm:px-6 lg:px-8 py-4 ">
           <ul className="flex items-center gap-20 flex-wrap ml-85 ">
             <li><Button variant="outline">Education</Button></li>

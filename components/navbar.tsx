@@ -31,7 +31,7 @@ export const Navbar = () => {
           <li><Link href="/shop" className="hover:text-blue-600 transition-colors">Shop</Link></li>
           <li><Link href="/categories" className="hover:text-blue-600 transition-colors">Categories</Link></li>
           <li><Link href="/cart" className="hover:text-blue-600 transition-colors">Cart</Link></li>
-          <li><Link href="/admin" className="hover:text-blue-600 transition-colors">Admin</Link></li>
+          <li><Link href="/admin" className="hover:text-blue-600 transition-colors">admin</Link></li>
         </ul>
       </div>
       
@@ -42,7 +42,7 @@ export const Navbar = () => {
           <Link href="/shop" className="hover:text-blue-600 transition-colors py-2">Shop</Link>
           <Link href="/categories" className="hover:text-blue-600 transition-colors py-2">Categories</Link>
           <Link href="/cart" className="hover:text-blue-600 transition-colors py-2">Cart</Link>
-          <Link href="/Admin" className="hover:text-blue-600 transition-colors py-2">Admin</Link>
+          <Link href="/Admin" className="hover:text-blue-600 transition-colors py-2">admin</Link>
         </div>
       )}
     </nav>
