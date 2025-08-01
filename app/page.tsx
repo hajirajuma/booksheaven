@@ -148,11 +148,11 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
           <Link href="/shop">
 
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
+            <button className="w-full sm:w-auto bg-gray-900 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
               Browse 
             </button> </Link>
             <Link href="/categories">
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
+            <button className="w-full sm:w-auto bg-gray-900  hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
               Category
               <MoveRight size={20} className="ml-2" />
             </button> </Link>

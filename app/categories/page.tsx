@@ -65,9 +65,9 @@ export default function CategoriesPage () {
     <div className="min-h-screen bg-gray-50">
       
       {/* Category Buttons at the top */}
-      <div className="bg-white shadow-sm border-b items-center">
-        <div className="max-w-7xl ml-55 px-4 sm:px-6 lg:px-8 py-4">
-          <ul className="flex items-center gap-12 flex-wrap">
+      <div className="bg-gray-900 shadow-sm border-b items-center">
+        <div className="max-w-7xl ml-55 px-4 sm:px-6 lg:px-8 py-4 ">
+          <ul className="flex items-center gap-20 flex-wrap ml-85 ">
             <li><Button variant="outline">Education</Button></li>
             <li><Button variant="outline">Romance</Button></li>
             <li><Button variant="outline">History</Button></li>
@@ -83,24 +83,24 @@ export default function CategoriesPage () {
           
         {/* Search Bar */}
           <div className="flex justify-center items-center  mb-12 md:mb-16 lg:mb-20">
-            <div className="relative w-full max-w-md">
+            <div className="relative w-full max-w-md top-10">
               <input 
                 type="text" 
                 placeholder="Search by genres,author,title..." 
-                className="w-full p-3 md:p-4 pr-12 border-2 border-yellow-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-700 placeholder-gray-500"
+                className="w-full p-3 md:p-4 pr-12 border-2 border-gray-900 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-700 placeholder-gray-500"
               />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-700 hover:text-yellow-800 transition-colors">
+              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-900 hover:text-yellow-800 transition-colors">
                 <Search size={20} />
               </button>
             </div>
           </div>
 
           {/* Books List - Vertical Layout with Details on Left */}
-          <div className="space-y-6 mb-16">
+          <div className="space-y-6 mb-16 ">
             {books.map((book) => (
               <div 
                 key={book.id}
-                className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                className="bg-white border-2 border-blue-200  rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Book Image - Left side */}
@@ -147,11 +147,11 @@ export default function CategoriesPage () {
                         href={book.pdfUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="bg-yellow-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm"
+                        className="bg-gray-900 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm"
                       >
                         View PDF
                       </a>
-                      <button className="bg-yellow-700 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm">
+                      <button className="bg-gray-900 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm">
                         Add to Cart
                       </button>
                     </div>
@@ -163,11 +163,11 @@ export default function CategoriesPage () {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
+            <button className="w-full sm:w-auto bg-gray-900 hover:bg-yellow-700 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
               View All Categories
             </button>
             
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
+            <button className="w-full sm:w-auto bg-gray-900 hover:bg-yellow-700 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
               Browse More
               <MoveRight size={20} className="ml-2" />
             </button>
