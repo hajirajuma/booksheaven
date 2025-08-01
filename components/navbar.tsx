@@ -9,10 +9,10 @@ export const Navbar = () => {
   return (
     <nav className="flex items-center justify-between p-4 sticky top-0 bg-white text-yellow-700 font-bold shadow-md z-50">
       <div className="text-lg font-bold">
-        <Link href="/" className="hover:text-blue-600  flex items-center gap-1">
+        <Link href="/" className=" flex items-center gap-1 hover:text-blue-600  ">
           <BookOpen size={24} />
-          <span className="text-yellow-700">Book</span>
-          <span className="text-blue-700">Heaven</span>
+          <span className="text-yellow-700 hover:text-blue-600  ">Book</span>
+          <span className="text-yellow-700 hover:text-blue-600  ">Heaven</span>
         </Link>  
       </div>   
       

@@ -11,7 +11,7 @@ export const Footer = () => {
             <BookOpen size={24} className="text-yellow-700" />
             <span className="text-lg font-bold">
               <span className="text-yellow-700">Book</span>
-              <span className="text-blue-700 font-bold">Heaven</span>
+              <span className="text-yellow-700 font-bold">Heaven</span>
             </span>
           </Link>     
         </div>

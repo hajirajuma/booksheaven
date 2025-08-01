@@ -74,7 +74,7 @@ export default function Home() {
           <h2 className="text-white text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-wide">
             Welcome To
           </h2>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl text-yellow-700 font-bold mb-4 md:mb-6 tracking-tight">
+          <h1 className=" md:text-6xl lg:text-7xl  text-yellow-700 text-4xl  font-bold mb-4 md:mb-6 tracking-tight">
              BookHeaven
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-white font-light">
