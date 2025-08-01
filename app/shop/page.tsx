@@ -63,26 +63,7 @@ export default function ShopPage () {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div 
-        className="relative bg-gradient-to-br bg-cover bg-center min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] flex items-center justify-center"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/open.jpg')"
-        }}
-      >
-        <div className="text-center py-8 md:py-16 lg:py-20 px-4 max-w-4xl mx-auto">
-          <h2 className="text-white text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-wide">
-           Read Clearly
-          </h2>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl text-yellow-700 font-bold mb-4 md:mb-6 tracking-tight">
-            And 
-          </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-white font-light">
-            Change Your Mindset
-          </p>
-        </div>
-      </div>
-
+      
       {/* Library Section */}
       <div className="bg-white shadow-lg w-full min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
