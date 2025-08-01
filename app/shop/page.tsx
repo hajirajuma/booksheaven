@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MoveRight, Search } from "lucide-react";
+import Link from "next/link";
 
 export default function ShopPage () {
   
@@ -151,11 +152,11 @@ export default function ShopPage () {
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
               Add to Cart
             </button>
-            
+           <Link href="/categories"> 
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
               Category
               <MoveRight size={20} className="ml-2" />
-            </button>
+            </button></Link>
           </div>
         </div>
       </div>

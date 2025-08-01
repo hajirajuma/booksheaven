@@ -6,6 +6,7 @@ import atom from "../public/books/atom.jpg";
 import data1 from "../public/books/data1.jpg";
 import Image from "next/image";
 import { MoveRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   
@@ -145,14 +146,16 @@ export default function Home() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
+          <Link href="/shop">
+
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
               Browse 
-            </button>
-            
+            </button> </Link>
+            <Link href="/categories">
             <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
               Category
               <MoveRight size={20} className="ml-2" />
-            </button>
+            </button> </Link>
           </div>
         </div>
       </div>
@@ -230,6 +233,7 @@ export default function Home() {
           </div> 
           
             <button className=" hover:scale-105 hover:shadow-xl hover:bg-blue-700 mt-20 bg-yellow-700 top-20 items-center rounded-md text-white p-2 w-30 ml-60  shadow-md">Add to Cart</button>
+        
             <button className=" hover:scale-105 hover:shadow-xl hover:bg-blue-700 mt-20 top-20 bg-yellow-700 rounded-md items-center  text-white p-2  w-30 ml-60  shadow-md inline-flex ">Category<MoveRight size={24} className="text-white ml-3"/></button>
       
         </div>
@@ -241,4 +245,5 @@ export default function Home() {
 
    </>
   )
-} */}
+} 
+*/}
