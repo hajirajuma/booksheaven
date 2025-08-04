@@ -16,6 +16,7 @@ export default function Home() {
       title: "Data Analysis using SQL and Excel",
       author: "Gordon S.Linoff",
       publisher: "Wiley Publishing",
+      price: "K40000/$4.5",
       image: data1,
       pdfUrl: "/books/data.pdf"
     },
@@ -24,6 +25,7 @@ export default function Home() {
       title: "JavaScript: The Complete Guide",
       author: "David Flanagan",
       publisher: "O'Reilly Media",
+      price: "K40000/$4.5",
       image: atom,
       pdfUrl: "/books/data.pdf"
     },
@@ -31,6 +33,7 @@ export default function Home() {
       id: 3,
       title: "Linear Algebra and Its Applications",
       author: "David C. Lay",
+      price: "K40000/$4.5",
       publisher: "Pearson",
       image: java,
       pdfUrl: "/books/data.pdf"
@@ -40,6 +43,7 @@ export default function Home() {
       title: "Physics: Principles and Problems",
       author: "Paul W. Zitzewitz",
       publisher: "McGraw-Hill",
+      price: "K40000/$4.5",
       image: phy,
       pdfUrl: "/books/data.pdf"
     },
@@ -48,6 +52,7 @@ export default function Home() {
       title: "Java Programming Fundamentals",
       author: "Oracle Press",
       publisher: "McGraw-Hill",
+      price: "K40000/$4.5",
       image: line,
       pdfUrl: "/books/data.pdf"
     },
@@ -56,6 +61,7 @@ export default function Home() {
       title: "Atomic Structure and Chemical Bonding",
       author: "Linus Pauling",
       publisher: "Academic Press",
+      price: "K40000/$4.5",
       image: stat,
       pdfUrl: "/books/data.pdf"
     }
@@ -138,6 +144,9 @@ export default function Home() {
                   </p>
                   <p className="text-gray-600 text-xs md:text-sm">
                     <span className="font-medium">Publisher:</span> {book.publisher}
+                  </p>
+                  <p className="text-gray-600 font-bold text-base md:text-lg">
+                      {book.price}
                   </p>
                 </div>
               </div>
