@@ -4,16 +4,37 @@ import { MoveRight, Search, Eye, ShoppingCart, Plus, Minus } from "lucide-react"
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  publisher: string;
+  price: string;
+  numericPrice: number;
+  image: string;
+  pdfUrl: string;
+  quantity?: number;
+}
+
+interface CartItem extends Book {
+  quantity: number;
+}
+
 export default function ShopPage() {
-  const [cart, setCart] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showCart, setShowCart] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [showCart, setShowCart] = useState<boolean>(false);
 
   // Load cart from localStorage on component mount
   useEffect(() => {
     const savedCart = localStorage.getItem('bookCart');
     if (savedCart) {
-      setCart(JSON.parse(savedCart));
+      try {
+        const parsedCart = JSON.parse(savedCart) as CartItem[];
+        setCart(parsedCart);
+      } catch (error) {
+        console.error("Failed to parse cart data", error);
+      }
     }
   }, []);
 
@@ -22,7 +43,7 @@ export default function ShopPage() {
     localStorage.setItem('bookCart', JSON.stringify(cart));
   }, [cart]);
 
-  const books = [
+  const books: Book[] = [
     {
       id: 1,
       title: "Data Analysis using SQL and Excel",
@@ -92,7 +113,7 @@ export default function ShopPage() {
   );
 
   // Add book to cart
-  const addToCart = (book) => {
+  const addToCart = (book: Book) => {
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === book.id);
       if (existingItem) {
@@ -108,12 +129,12 @@ export default function ShopPage() {
   };
 
   // Remove book from cart
-  const removeFromCart = (bookId) => {
+  const removeFromCart = (bookId: number) => {
     setCart(prevCart => prevCart.filter(item => item.id !== bookId));
   };
 
   // Update quantity in cart
-  const updateQuantity = (bookId, newQuantity) => {
+  const updateQuantity = (bookId: number, newQuantity: number) => {
     if (newQuantity === 0) {
       removeFromCart(bookId);
     } else {
@@ -128,18 +149,17 @@ export default function ShopPage() {
   };
 
   // Get total cart items
-  const getTotalItems = () => {
+  const getTotalItems = (): number => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
   // Get total cart price
-  const getTotalPrice = () => {
+  const getTotalPrice = (): string => {
     return cart.reduce((total, item) => total + (item.numericPrice * item.quantity), 0).toFixed(2);
   };
 
   // View PDF function
-  const viewPDF = (pdfUrl, title) => {
-    // Open PDF in new tab
+  const viewPDF = (pdfUrl: string, title: string): void => {
     window.open(pdfUrl, '_blank');
   };
 
@@ -163,7 +183,13 @@ export default function ShopPage() {
                 <div className="space-y-4 mb-6">
                   {cart.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
-                      <Image src={item.image} alt={item.title} width={60} height={80} className="object-cover rounded" />
+                      <Image 
+                        src={item.image} 
+                        alt={item.title} 
+                        width={60} 
+                        height={80} 
+                        className="object-cover rounded" 
+                      />
                       <div className="flex-1">
                         <h4 className="font-medium text-sm">{item.title}</h4>
                         <p className="text-gray-600 text-xs">{item.author}</p>
@@ -292,13 +318,13 @@ export default function ShopPage() {
           {/* No results message */}
           {filteredBooks.length === 0 && searchTerm && (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No books found matching "{searchTerm}"</p>
+              <p className="text-gray-500 text-lg">No books found matching &quot;{searchTerm}&quot;</p>
             </div>
           )}
 
           {/* Category Button */}
           <div className="flex justify-center items-center pb-16 md:pb-20">
-            <Link href="/categories"> 
+            <Link href="/categories" passHref> 
               <button className="bg-gray-900 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
                 Browse Categories
                 <MoveRight size={20} className="ml-2" />
@@ -458,4 +484,4 @@ export default function ShopPage () {
     </div>
   );
 } 
-*/}
+*/} 

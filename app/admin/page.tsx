@@ -1,44 +1,58 @@
 'use client';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+
+interface Book {
+  id: number;
+  title: string;
+  author: string;
+  price: string;
+}
+
+interface Order {
+  id: string;
+  buyer: string;
+  items: string;
+  total: string;
+  status: 'Pending' | 'Unpaid' | 'Paid';
+}
 
 export default function AdminPage() {
-  // Sample data for books
-  const books = [
+  // Sample data for books with proper typing
+  const books: Book[] = [
     { id: 1, title: "JavaScript", author: "David", price: "$250.00" },
     { id: 2, title: "Linear", author: "Gordof Alice", price: "$8.00" },
     { id: 3, title: "Calculus", author: "Zain", price: "$45.00" },
     { id: 4, title: "Atomic Habits", author: "James Clear", price: "$32.00" }
-  ]
+  ];
 
-  // Sample data for orders
-  const orders = [
+  // Sample data for orders with proper typing
+  const orders: Order[] = [
     { id: "01", buyer: "Jane Banda", items: "Book A, Book B", total: "$250.00", status: "Pending" },
     { id: "02", buyer: "Shakira Meya", items: "Book B", total: "$89.00", status: "Unpaid" },
     { id: "03", buyer: "Vincent Moya", items: "Book C", total: "$75.00", status: "Paid" },
     { id: "04", buyer: "Adam Phiri", items: "Book A", total: "$32.00", status: "Paid" }
-  ]
+  ];
 
-  const handleDeleteBook = (id) => {
-    // Add your delete logic here
-    console.log(`Deleting book with ID: ${id}`)
-  }
+  const handleDeleteBook = (id: number): void => {
+    console.log(`Deleting book with ID: ${id}`);
+  };
 
-  const handleAddNewBook = () => {
-    console.log("Add new book clicked")
-  }
+  const handleAddNewBook = (): void => {
+    console.log("Add new book clicked");
+  };
 
-  const handleViewInventory = () => {
-    console.log("View inventory clicked")
-  }
+  const handleViewInventory = (): void => {
+    console.log("View inventory clicked");
+  };
 
-  const handleViewOrders = () => {
-    console.log("View orders clicked")
-  }
+  const handleViewOrders = (): void => {
+    console.log("View orders clicked");
+  };
 
-  const handleEditBook = (id) => {
-    console.log(`Editing book with ID: ${id}`)
-  }
+  const handleEditBook = (id: number): void => {
+    console.log(`Editing book with ID: ${id}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -171,7 +185,6 @@ export default function AdminPage() {
     </div>
   );
 }
-
 
 {/*('use client';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
