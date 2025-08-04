@@ -19,6 +19,181 @@ export default function AdminPage() {
     { id: "04", buyer: "Adam Phiri", items: "Book A", total: "$32.00", status: "Paid" }
   ]
 
+  const handleDeleteBook = (id) => {
+    // Add your delete logic here
+    console.log(`Deleting book with ID: ${id}`)
+  }
+
+  const handleAddNewBook = () => {
+    console.log("Add new book clicked")
+  }
+
+  const handleViewInventory = () => {
+    console.log("View inventory clicked")
+  }
+
+  const handleViewOrders = () => {
+    console.log("View orders clicked")
+  }
+
+  const handleEditBook = (id) => {
+    console.log(`Editing book with ID: ${id}`)
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-center text-yellow-700 mb-8">
+          Admin Panel
+        </h1>
+
+        {/* Navigation Buttons - Responsive */}
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-4">
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+              onClick={handleAddNewBook}
+            >
+              Add New Book
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+              onClick={handleViewInventory}
+            >
+              View Inventory
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto bg-gray-900 text-white hover:bg-gray-800 transition-colors"
+              onClick={handleViewOrders}
+            >
+              View Orders
+            </Button>
+          </div>
+        </div>
+
+        {/* Books Table */}
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-center text-yellow-700 mb-6">
+            Books List
+          </h2>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[60px] sm:w-[100px]">ID</TableHead>
+                  <TableHead className="min-w-[120px]">Title</TableHead>
+                  <TableHead className="min-w-[120px]">Author</TableHead>
+                  <TableHead className="text-right min-w-[80px]">Price</TableHead>
+                  <TableHead className="text-right min-w-[140px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {books.map((book) => (
+                  <TableRow key={book.id}>
+                    <TableCell className="font-medium">{book.id}</TableCell>
+                    <TableCell className="font-medium">{book.title}</TableCell>
+                    <TableCell>{book.author}</TableCell>
+                    <TableCell className="text-right font-semibold">{book.price}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex flex-col sm:flex-row gap-2 justify-end">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-gray-900 hover:text-yellow-900 hover:bg-blue-50"
+                          onClick={() => handleEditBook(book.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button 
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteBook(book.id)} 
+                          className="bg-gray-900 hover:bg-yellow-700 text-white"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Orders Table */}
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-center text-yellow-700 mb-6">
+            Orders
+          </h2>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[60px] sm:w-[100px]">#</TableHead>
+                  <TableHead className="min-w-[120px]">Buyer</TableHead>
+                  <TableHead className="min-w-[140px]">Items</TableHead>
+                  <TableHead className="text-right min-w-[80px]">Total</TableHead>
+                  <TableHead className="text-right min-w-[100px]">Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{order.id}</TableCell>
+                    <TableCell className="font-medium">{order.buyer}</TableCell>
+                    <TableCell className="text-sm">{order.items}</TableCell>
+                    <TableCell className="text-right font-semibold">{order.total}</TableCell>
+                    <TableCell className="text-right">
+                      <span 
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          order.status === 'Paid' 
+                            ? 'bg-green-100 text-green-800' 
+                            : order.status === 'Pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {order.status}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+{/*('use client';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+
+export default function AdminPage() {
+  // Sample data for books
+  const books = [
+    { id: 1, title: "JavaScript", author: "David", price: "$250.00" },
+    { id: 2, title: "Linear", author: "Gordof Alice", price: "$8.00" },
+    { id: 3, title: "Calculus", author: "Zain", price: "$45.00" },
+    { id: 4, title: "Atomic Habits", author: "James Clear", price: "$32.00" }
+  ]
+
+  // Sample data for orders
+  const orders = [
+    { id: "01", buyer: "Jane Banda", items: "Book A, Book B", total: "$250.00", status: "Pending" },
+    { id: "02", buyer: "Shakira Meya", items: "Book B", total: "$89.00", status: "Unpaid" },
+    { id: "03", buyer: "Vincent Moya", items: "Book C", total: "$75.00", status: "Paid" },
+    { id: "04", buyer: "Adam Phiri", items: "Book A", total: "$32.00", status: "Paid" }
+  ]
+
   const handleDeleteBook = (id: number) => {
     // Add your delete logic here
     console.log(`Deleting book with ID: ${id}`)
@@ -27,12 +202,12 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
+        {/* Header 
         <h1 className="text-3xl font-bold text-center text-yellow-700 mb-8">
           Admin Panel
         </h1>
 
-        {/* Navigation Buttons */}
+        {/* Navigation Buttons 
     
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <ul className="flex items-center ml-96 gap-15 flex-wrap">
@@ -43,7 +218,7 @@ export default function AdminPage() {
           </div>
         
 
-        {/* Books Table */}
+        {/* Books Table 
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h1 className="text-2xl font-bold text-center text-yellow-700 mb-6">
             Books List
@@ -82,7 +257,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Orders Table */}
+        {/* Orders Table
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h1 className="text-2xl font-bold text-center text-yellow-700 mb-6">
             Orders
@@ -116,3 +291,6 @@ export default function AdminPage() {
     </div>
   );
 }
+
+)
+*/}
