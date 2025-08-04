@@ -67,8 +67,8 @@ export default function CategoriesPage () {
       
       {/* Category Buttons at the top */}
       <div className="shadow-sm border-b items-center">
-        <div className="max-w-7xl ml-55 px-4 sm:px-6 lg:px-8 py-4 ">
-          <ul className="flex items-center gap-5 flex-wrap  ">
+        <div className="max-w-7xl ml-80 px-4 sm:px-6 lg:px-8 py-4 ">
+          <ul className="flex items-center gap-10 flex-wrap  ">
             <li><Button variant="outline">Education</Button></li>
             <li><Button variant="outline">Romance</Button></li>
             <li><Button variant="outline">History</Button></li>
