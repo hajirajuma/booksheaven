@@ -20,10 +20,14 @@ interface CartItem extends Book {
   quantity: number;
 }
 
+
+
 export default function ShopPage() {
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showCart, setShowCart] = useState<boolean>(false);
+
 
   // Load cart from localStorage on component mount
   useEffect(() => {
