@@ -20,7 +20,7 @@ interface CartItem extends Book {
 }
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function CategoriesPage() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -216,7 +216,7 @@ export default function CategoriesPage() {
     }
   };
 
-  // Add book to cart (API integration)
+  // Add book to cart 
   const addToCartAPI = async (bookId: string, userId?: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/books/cart`, {
