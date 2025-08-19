@@ -72,11 +72,38 @@ export default function ShopPage() {
     }
   };
 
+  // Add to cart
+  const addToCart = async (bookId: number, quantity: number = 1) => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`/api/cart/${sessionId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ bookId, quantity }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add to cart');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setCart(result.data);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   // Update quantity
   const updateQuantity = async (bookId: number, newQuantity: number) => {
     try {
       const sessionId = getSessionId();
-      const response = await fetch(`/api/cart/${sessionId}/update/${bookId}`, {
+      const response = await fetch(`/api/cart/${sessionId}/${bookId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +130,7 @@ export default function ShopPage() {
   const removeFromCart = async (bookId: number) => {
     try {
       const sessionId = getSessionId();
-      const response = await fetch(`/api/cart/${sessionId}/remove/${bookId}`, {
+      const response = await fetch(`/api/cart/${sessionId}/${bookId}`, {
         method: 'DELETE',
       });
       
