@@ -66,7 +66,17 @@ export default function ShopPage() {
         throw new Error(result.message);
       }
     } catch (err: any) {
+      console.error('Error fetching cart:', err);
       setError(err.message);
+      
+      // Fallback to empty cart if API fails
+      setCart({
+        sessionId: getSessionId(),
+        items: [],
+        total: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
     } finally {
       setLoading(false);
     }
@@ -76,12 +86,12 @@ export default function ShopPage() {
   const updateQuantity = async (bookId: number, newQuantity: number) => {
     try {
       const sessionId = getSessionId();
-      const response = await fetch(`/api/cart/${sessionId}/update/${bookId}`, {
+      const response = await fetch(`/api/cart/${sessionId}/${bookId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ quantity: newQuantity }),
+        body: JSON.stringify({ quantity: Math.max(1, newQuantity) }),
       });
       
       if (!response.ok) {
@@ -95,7 +105,10 @@ export default function ShopPage() {
         throw new Error(result.message);
       }
     } catch (err: any) {
+      console.error('Error updating quantity:', err);
       setError(err.message);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
     }
   };
 
@@ -103,7 +116,7 @@ export default function ShopPage() {
   const removeFromCart = async (bookId: number) => {
     try {
       const sessionId = getSessionId();
-      const response = await fetch(`/api/cart/${sessionId}/remove/${bookId}`, {
+      const response = await fetch(`/api/cart/${sessionId}/${bookId}`, {
         method: 'DELETE',
       });
       
@@ -118,7 +131,10 @@ export default function ShopPage() {
         throw new Error(result.message);
       }
     } catch (err: any) {
+      console.error('Error removing item:', err);
       setError(err.message);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
     }
   };
 
@@ -141,7 +157,10 @@ export default function ShopPage() {
         throw new Error(result.message);
       }
     } catch (err: any) {
+      console.error('Error clearing cart:', err);
       setError(err.message);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
     }
   };
 
@@ -158,20 +177,24 @@ export default function ShopPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <p className="text-red-500">Error: {error}</p>
-        <Button onClick={fetchCart} className="mt-4">Retry</Button>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 ">
       <h1 className="text-3xl md:text-6xl lg:text-7xl text-center text-gray-900 font-semibold mb-4 md:mb-6 tracking-tight">
         Your Cart
       </h1>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="absolute top-0 right-0 p-2"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Books Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
@@ -281,10 +304,13 @@ export default function ShopPage() {
       )}
 
       {/* Empty cart message */}
-      {(!cart || cart.items.length === 0) && (
+      {(!cart || cart.items.length === 0) && !loading && (
         <div className="text-center py-16">
           <h2 className="text-2xl font-bold text-gray-600 mb-4">Your cart is empty</h2>
           <p className="text-gray-500">Add some books to get started!</p>
+          <Link href="/books">
+            <Button className="mt-4">Browse Books</Button>
+          </Link>
         </div>
       )}
     </div>
