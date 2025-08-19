@@ -20,34 +20,21 @@ interface CartItem extends Book {
   quantity: number;
 }
 
-
+// API Configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function ShopPage() {
   
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showCart, setShowCart] = useState<boolean>(false);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [checkoutLoading, setCheckoutLoading] = useState<boolean>(false);
 
-
-  // Load cart from localStorage on component mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('bookCart');
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart) as CartItem[];
-        setCart(parsedCart);
-      } catch (error) {
-        console.error("Failed to parse cart data", error);
-      }
-    }
-  }, []);
-
-  // Save cart to localStorage whenever cart changes
-  useEffect(() => {
-    localStorage.setItem('bookCart', JSON.stringify(cart));
-  }, [cart]);
-
-  const books: Book[] = [
+  // Static books data as fallback
+  const fallbackBooks: Book[] = [
     {
       id: 1,
       title: "Data Analysis using SQL and Excel",
@@ -110,7 +97,159 @@ export default function ShopPage() {
     }
   ];
 
-  // Filter books based on search term
+  // Fetch books from API
+  const fetchBooks = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/books`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && Array.isArray(data.data)) {
+        // Transform backend data to match frontend interface
+        const transformedBooks = data.data.map((book: any) => ({
+          ...book,
+          price: book.price || `$${book.numericPrice}` // Ensure price string exists
+        }));
+        setBooks(transformedBooks);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error fetching books from API:', error);
+      setError('Failed to load books from server. Using local data.');
+      setBooks(fallbackBooks);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search books via API
+  const searchBooks = async (query: string) => {
+    if (!query.trim()) {
+      fetchBooks();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && Array.isArray(data.data)) {
+        const transformedBooks = data.data.map((book: any) => ({
+          ...book,
+          price: book.price || `$${book.numericPrice}`
+        }));
+        setBooks(transformedBooks);
+      } else {
+        throw new Error('Invalid search response format');
+      }
+    } catch (error) {
+      console.error('Error searching books:', error);
+      // Fallback to client-side search
+      const filtered = fallbackBooks.filter(book =>
+        book.title.toLowerCase().includes(query.toLowerCase()) ||
+        book.author.toLowerCase().includes(query.toLowerCase())
+      );
+      setBooks(filtered);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Create order via API
+  const createOrder = async (customerName?: string, customerEmail?: string) => {
+    try {
+      setCheckoutLoading(true);
+      
+      const orderItems = cart.map(item => ({
+        bookId: item.id,
+        quantity: item.quantity
+      }));
+
+      const response = await fetch(`${API_BASE_URL}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerName: customerName || 'Guest Customer',
+          customerEmail: customerEmail || 'guest@example.com',
+          items: orderItems
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Clear cart after successful order
+        setCart([]);
+        setShowCart(false);
+        alert(`Order created successfully! Order ID: ${data.data.id}`);
+        return data.data;
+      } else {
+        throw new Error(data.message || 'Failed to create order');
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert('Failed to create order. Please try again.');
+      throw error;
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('bookCart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart) as CartItem[];
+        setCart(parsedCart);
+      } catch (error) {
+        console.error("Failed to parse cart data", error);
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    localStorage.setItem('bookCart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Fetch books on component mount
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  // Handle search with debouncing
+  useEffect(() => {
+    const delayedSearch = setTimeout(() => {
+      if (searchTerm) {
+        searchBooks(searchTerm);
+      } else {
+        fetchBooks();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayedSearch);
+  }, [searchTerm]);
+
+  // Filter books based on search term (for fallback)
   const filteredBooks = books.filter(book =>
     book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     book.author.toLowerCase().includes(searchTerm.toLowerCase())
@@ -165,6 +304,16 @@ export default function ShopPage() {
   // View PDF function
   const viewPDF = (pdfUrl: string, title: string): void => {
     window.open(pdfUrl, '_blank');
+  };
+
+  // Handle checkout
+  const handleCheckout = async () => {
+    try {
+      // You can add a modal here to collect customer details
+      await createOrder();
+    } catch (error) {
+      // Error is handled in createOrder function
+    }
   };
 
   return (
@@ -222,8 +371,12 @@ export default function ShopPage() {
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-lg font-bold">Total: ${getTotalPrice()}</span>
                   </div>
-                  <button className="w-full bg-gray-900 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
-                    Proceed to Checkout
+                  <button 
+                    onClick={handleCheckout}
+                    disabled={checkoutLoading}
+                    className="w-full bg-gray-900 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    {checkoutLoading ? 'Processing...' : 'Proceed to Checkout'}
                   </button>
                 </div>
               </>
@@ -248,6 +401,13 @@ export default function ShopPage() {
                 </span>
               )}
             </button>
+            
+            {/* Error message */}
+            {error && (
+              <div className="text-red-600 text-sm bg-red-100 px-4 py-2 rounded">
+                {error}
+              </div>
+            )}
           </div>
 
           {/* Search Bar */}
@@ -266,61 +426,70 @@ export default function ShopPage() {
             </div>
           </div>
 
-          {/* Books Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
-            {filteredBooks.map((book) => (
-              <div 
-                key={book.id}
-                className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="relative overflow-hidden rounded-lg bg-gray-100 mb-4">
-                  <Image 
-                    src={book.image} 
-                    alt={book.title}
-                    width={200}
-                    height={280}
-                    className="w-full h-48 md:h-56 object-cover"
-                  />
-                </div>
-                
-                <div className="space-y-2 mb-4">
-                  <h3 className="text-gray-900 font-semibold text-sm md:text-base line-clamp-2 leading-tight">
-                    {book.title}
-                  </h3>
-                  <p className="text-gray-600 text-xs md:text-sm">
-                    <span className="font-medium">Author:</span> {book.author}
-                  </p>
-                  <p className="text-gray-600 text-xs md:text-sm">
-                    <span className="font-medium">Publisher:</span> {book.publisher}
-                  </p>
-                  <p className="text-gray-600 font-bold text-sm md:text-base">
-                    {book.price}
-                  </p>
-                </div>
+          {/* Loading state */}
+          {loading && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Loading books...</p>
+            </div>
+          )}
 
-                {/* Action Buttons for each book */}
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => viewPDF(book.pdfUrl, book.title)}
-                    className="flex-1 bg-gray-900 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center text-sm"
-                  >
-                    <Eye size={16} className="mr-1" />
-                    View PDF
-                  </button>
-                  <button 
-                    onClick={() => addToCart(book)}
-                    className="flex-1 bg-yellow-700 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center text-sm"
-                  >
-                    <ShoppingCart size={16} className="mr-1" />
-                    Add to Cart
-                  </button>
+          {/* Books Grid */}
+          {!loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
+              {filteredBooks.map((book) => (
+                <div 
+                  key={book.id}
+                  className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <div className="relative overflow-hidden rounded-lg bg-gray-100 mb-4">
+                    <Image 
+                      src={book.image} 
+                      alt={book.title}
+                      width={200}
+                      height={280}
+                      className="w-full h-48 md:h-56 object-cover"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <h3 className="text-gray-900 font-semibold text-sm md:text-base line-clamp-2 leading-tight">
+                      {book.title}
+                    </h3>
+                    <p className="text-gray-600 text-xs md:text-sm">
+                      <span className="font-medium">Author:</span> {book.author}
+                    </p>
+                    <p className="text-gray-600 text-xs md:text-sm">
+                      <span className="font-medium">Publisher:</span> {book.publisher}
+                    </p>
+                    <p className="text-gray-600 font-bold text-sm md:text-base">
+                      {book.price}
+                    </p>
+                  </div>
+
+                  {/* Action Buttons for each book */}
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => viewPDF(book.pdfUrl, book.title)}
+                      className="flex-1 bg-gray-900 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center text-sm"
+                    >
+                      <Eye size={16} className="mr-1" />
+                      View PDF
+                    </button>
+                    <button 
+                      onClick={() => addToCart(book)}
+                      className="flex-1 bg-yellow-700 hover:bg-gray-900 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center text-sm"
+                    >
+                      <ShoppingCart size={16} className="mr-1" />
+                      Add to Cart
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* No results message */}
-          {filteredBooks.length === 0 && searchTerm && (
+          {!loading && filteredBooks.length === 0 && searchTerm && (
             <div className="text-center py-12">
               <p className="text-gray-500 text-lg">No books found matching &quot;{searchTerm}&quot;</p>
             </div>
@@ -340,152 +509,3 @@ export default function ShopPage() {
     </div>
   );
 }
-
-{/*'use client';
-import Image from "next/image";
-import { MoveRight, Search } from "lucide-react";
-import Link from "next/link";
-
-export default function ShopPage () {
-  
-  const books = [
-    {
-      id: 1,
-      title: "Data Analysis using SQL and Excel",
-      author: "Gordon S.Linoff",
-      publisher: "Wiley Publishing",
-      price: "K40000/$4.5",
-      image: "/books/data1.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 2,
-      title: "JavaScript: The Complete Guide",
-      author: "David Flanagan",
-      publisher: "O'Reilly Media",
-      price: "K30000/$3.8",
-      image: "/books/atom.jpg",
-      pdfUrl: "/books/javascript.pdf"
-    },
-    {
-      id: 3,
-      title: "Linear Algebra and Its Applications",
-      author: "David C. Lay",
-      publisher: "Pearson",
-      price: "K50000/$6.4",
-      image: "/books/java.jpg",
-      pdfUrl: "/books/linear.pdf"
-    },
-    {
-      id: 4,
-      title: "Physics: Principles and Problems",
-      author: "Paul W. Zitzewitz",
-      publisher: "McGraw-Hill",
-      price: "K45000/$5.7",
-      image: "/books/phy.jpg",
-      pdfUrl: "/books/physics.pdf"
-    },
-    {
-      id: 5,
-      title: "Java Programming Fundamentals",
-      author: "Oracle Press",
-      publisher: "McGraw-Hill",
-      price: "K35000/$4.4",
-      image: "/books/line.jpg",
-      pdfUrl: "/books/java.pdf"
-    },
-    {
-      id: 6,
-      title: "Atomic Structure and Chemical Bonding",
-      author: "Linus Pauling",
-      publisher: "Academic Press",
-      price: "K25000/$3.2",
-      image: "/books/stat.jpg",
-      pdfUrl: "/books/atom.pdf"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-50">
-      
-      {/* Library Section 
-      <div className="bg-white shadow-lg w-full min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Title 
-          <h2 className="text-center py-12 md:py-16 lg:py-20 text-3xl md:text-4xl lg:text-5xl text-yellow-700 font-bold tracking-wide">
-            My Library
-          </h2>
-
-          {/* Search Bar 
-          <div className="flex justify-center items-center mb-12 md:mb-16 lg:mb-20">
-            <div className="relative w-full max-w-md">
-              <input 
-                type="text" 
-                placeholder="Search books..." 
-                className="w-full p-3 md:p-4 pr-12 border-2 border-yellow-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-700 placeholder-gray-500"
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-yellow-700 hover:text-yellow-800 transition-colors">
-                <Search size={20} />
-              </button>
-            </div>
-          </div>
-
-          {/* Books Grid 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
-            {books.map((book) => (
-              <div 
-                key={book.id}
-                className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <a 
-                  href={book.pdfUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="block mb-4"
-                >
-                  <div className="relative overflow-hidden rounded-lg bg-gray-100">
-                    <Image 
-                      src={book.image} 
-                      alt={book.title}
-                      width={200}
-                      height={280}
-                      className="w-full h-48 md:h-56 object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                  </div>
-                </a>
-                
-                <div className="space-y-2">
-                  <h3 className="text-gray-900 font-semibold text-sm md:text-base line-clamp-2 leading-tight">
-                    {book.title}
-                  </h3>
-                  <p className="text-gray-600 text-xs md:text-sm">
-                    <span className="font-medium">Author:</span> {book.author}
-                  </p>
-                  <p className="text-gray-600 text-xs md:text-sm">
-                    <span className="font-medium">Publisher:</span> {book.publisher}
-                  </p>
-                  <p className="text-gray-600 font-bold text-sm md:text-base">
-                    {book.price}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Action Buttons 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pb-16 md:pb-20">
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl">
-              Add to Cart
-            </button>
-           <Link href="/categories"> 
-            <button className="w-full sm:w-auto bg-yellow-700 hover:bg-blue-800 hover:scale-105 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:shadow-xl inline-flex items-center justify-center">
-              Category
-              <MoveRight size={20} className="ml-2" />
-            </button></Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-} 
-*/} 
