@@ -15,17 +15,8 @@ interface Book {
   category?: string;
 }
 
-interface CartItem {
-  book: Book;
+interface CartItem extends Book {
   quantity: number;
-}
-
-interface Cart {
-  sessionId: string;
-  items: CartItem[];
-  total: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 // API Configuration
@@ -38,9 +29,8 @@ export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState<boolean>(false);
-  const [cart, setCart] = useState<Cart | null>(null);
-  const [cartLoading, setCartLoading] = useState<boolean>(true);
 
   // Static fallback data
   const fallbackBooks: Book[] = [
@@ -107,153 +97,6 @@ export default function CategoriesPage() {
   ];
 
   const fallbackCategories = ["Education", "Technology", "Romance", "History", "Life"];
-
-  // Get or create a session ID (same as cart page)
-  const getSessionId = (): string => {
-    if (typeof window === 'undefined') return 'default-session';
-    
-    let sessionId = localStorage.getItem('cartSessionId');
-    if (!sessionId) {
-      sessionId = 'session-' + Math.random().toString(36).substring(2, 15);
-      localStorage.setItem('cartSessionId', sessionId);
-    }
-    return sessionId;
-  };
-
-  // Fetch cart from backend (same as cart page)
-  const fetchCart = async () => {
-    try {
-      setCartLoading(true);
-      const sessionId = getSessionId();
-      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch cart');
-      }
-      
-      const result = await response.json();
-      if (result.success) {
-        setCart(result.data);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (err: any) {
-      console.error('Error fetching cart:', err);
-      
-      // Fallback to empty cart if API fails
-      setCart({
-        sessionId: getSessionId(),
-        items: [],
-        total: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
-    } finally {
-      setCartLoading(false);
-    }
-  };
-
-  // Add to cart function (API integration)
-  const addToCart = async (book: Book) => {
-    try {
-      const sessionId = getSessionId();
-      
-      // Convert the book to the format expected by the API
-      const apiBook = {
-        id: parseInt(book.id), // Assuming the API expects a number
-        title: book.title,
-        author: book.author,
-        publisher: book.publisher,
-        price: parseFloat(book.price.split('$')[1] || '0'), // Extract numeric price
-        displayPrice: book.price,
-        image: book.image,
-        pdfUrl: book.pdfUrl
-      };
-
-      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          book: apiBook,
-          quantity: 1
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to add to cart');
-      }
-      
-      const result = await response.json();
-      if (result.success) {
-        setCart(result.data);
-        return result.data;
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (err: any) {
-      console.error('Error adding to cart:', err);
-      setError(err.message);
-      // Re-fetch cart to ensure UI is in sync
-      fetchCart();
-      throw err;
-    }
-  };
-
-  // Update quantity in cart
-  const updateQuantity = async (bookId: number, newQuantity: number) => {
-    try {
-      const sessionId = getSessionId();
-      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/${bookId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ quantity: Math.max(1, newQuantity) }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update quantity');
-      }
-      
-      const result = await response.json();
-      if (result.success) {
-        setCart(result.data);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (err: any) {
-      console.error('Error updating quantity:', err);
-      setError(err.message);
-      fetchCart();
-    }
-  };
-
-  // Remove from cart
-  const removeFromCart = async (bookId: number) => {
-    try {
-      const sessionId = getSessionId();
-      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/${bookId}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to remove from cart');
-      }
-      
-      const result = await response.json();
-      if (result.success) {
-        setCart(result.data);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (err: any) {
-      console.error('Error removing item:', err);
-      setError(err.message);
-      fetchCart();
-    }
-  };
 
   // Fetch all books from API
   const fetchAllBooks = async () => {
@@ -373,11 +216,62 @@ export default function CategoriesPage() {
     }
   };
 
-  // Load initial data
+  // Add book to cart (API integration)
+  const addToCartAPI = async (bookId: string, userId?: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/books/cart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookId,
+          userId: userId || 'guest',
+          quantity: 1
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('Book added to cart via API:', data.data);
+        return data.data;
+      } else {
+        throw new Error(data.message || 'Failed to add to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart via API:', error);
+      // Continue with local cart functionality
+      throw error;
+    }
+  };
+
+  // Load cart from localStorage on component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('bookCart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart) as CartItem[];
+        setCart(parsedCart);
+      } catch (error) {
+        console.error("Failed to parse cart data", error);
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever cart changes
+  useEffect(() => {
+    localStorage.setItem('bookCart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Fetch initial data on component mount
   useEffect(() => {
     fetchAllBooks();
     fetchCategories();
-    fetchCart();
   }, []);
 
   // Handle search with debouncing
@@ -403,19 +297,68 @@ export default function CategoriesPage() {
     }
   };
 
-  // View PDF function
-  const viewPDF = (pdfUrl: string, title: string): void => {
-    window.open(pdfUrl, '_blank');
+  // Add book to local cart
+  const addToCart = async (book: Book) => {
+    // Try to add to API cart first, but continue with local cart regardless
+    try {
+      await addToCartAPI(book.id);
+    } catch (error) {
+      // API call failed, but we'll still add to local cart
+      console.log('API cart add failed, continuing with local cart');
+    }
+
+    // Add to local cart
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === book.id);
+      if (existingItem) {
+        return prevCart.map(item =>
+          item.id === book.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevCart, { ...book, quantity: 1 }];
+      }
+    });
+  };
+
+  // Remove book from cart
+  const removeFromCart = (bookId: string) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== bookId));
+  };
+
+  // Update quantity in cart
+  const updateQuantity = (bookId: string, newQuantity: number) => {
+    if (newQuantity === 0) {
+      removeFromCart(bookId);
+    } else {
+      setCart(prevCart =>
+        prevCart.map(item =>
+          item.id === bookId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
+    }
   };
 
   // Get total cart items
   const getTotalItems = (): number => {
-    return cart ? cart.items.reduce((total, item) => total + item.quantity, 0) : 0;
+    return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
   // Get total cart price
   const getTotalPrice = (): string => {
-    return cart ? cart.total.toFixed(2) : "0.00";
+    return cart.reduce((total, item) => {
+      // Extract numeric price from price string like "K40000/$4.5"
+      const numericPrice = parseFloat(item.price.split('$')[1] || '0');
+      return total + (numericPrice * item.quantity);
+    }, 0).toFixed(2);
+  };
+
+  // View PDF function
+  const viewPDF = (pdfUrl: string, title: string): void => {
+    window.open(pdfUrl, '_blank');
   };
 
   return (
@@ -431,37 +374,35 @@ export default function CategoriesPage() {
               </button>
             </div>
             
-            {cartLoading ? (
-              <p className="text-gray-500 text-center">Loading cart...</p>
-            ) : cart && cart.items.length === 0 ? (
+            {cart.length === 0 ? (
               <p className="text-gray-500 text-center">Your cart is empty</p>
             ) : (
               <>
                 <div className="space-y-4 mb-6">
-                  {cart?.items.map((item) => (
-                    <div key={item.book.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                       <Image 
-                        src={item.book.image} 
-                        alt={item.book.title} 
+                        src={item.image} 
+                        alt={item.title} 
                         width={60} 
                         height={80} 
                         className="object-cover rounded" 
                       />
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm">{item.book.title}</h4>
-                        <p className="text-gray-600 text-xs">{item.book.author}</p>
-                        <p className="font-bold text-sm">${(item.book.price * item.quantity).toFixed(2)}</p>
+                        <h4 className="font-medium text-sm">{item.title}</h4>
+                        <p className="text-gray-600 text-xs">{item.author}</p>
+                        <p className="font-bold text-sm">${(parseFloat(item.price.split('$')[1] || '0') * item.quantity).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button 
-                          onClick={() => updateQuantity(item.book.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           className="p-1 bg-gray-200 rounded hover:bg-gray-300"
                         >
                           <Minus size={16} />
                         </button>
                         <span className="w-8 text-center">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(item.book.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           className="p-1 bg-gray-200 rounded hover:bg-gray-300"
                         >
                           <Plus size={16} />
