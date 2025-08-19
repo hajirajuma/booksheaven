@@ -15,8 +15,17 @@ interface Book {
   category?: string;
 }
 
-interface CartItem extends Book {
+interface CartItem {
+  book: Book;
   quantity: number;
+}
+
+interface Cart {
+  sessionId: string;
+  items: CartItem[];
+  total: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // API Configuration
@@ -29,7 +38,7 @@ export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<Cart | null>(null);
   const [showCart, setShowCart] = useState<boolean>(false);
 
   // Static fallback data
@@ -63,40 +72,160 @@ export default function CategoriesPage() {
       image: "/books/java.jpg",
       pdfUrl: "/books/linear.pdf",
       category: "Education"
-    },
-    {
-      id: "4",
-      title: "Physics: Principles and Problems",
-      author: "Paul W. Zitzewitz",
-      publisher: "McGraw-Hill",
-      price: "K45000/$5.7",
-      image: "/books/phy.jpg",
-      pdfUrl: "/books/physics.pdf",
-      category: "Education"
-    },
-    {
-      id: "5",
-      title: "Java Programming Fundamentals",
-      author: "Oracle Press",
-      publisher: "McGraw-Hill",
-      price: "K35000/$4.4",
-      image: "/books/line.jpg",
-      pdfUrl: "/books/java.pdf",
-      category: "Technology"
-    },
-    {
-      id: "6",
-      title: "Atomic Structure and Chemical Bonding",
-      author: "Linus Pauling",
-      publisher: "Academic Press",
-      price: "K25000/$3.2",
-      image: "/books/stat.jpg",
-      pdfUrl: "/books/atom.pdf",
-      category: "Education"
     }
   ];
 
   const fallbackCategories = ["Education", "Technology", "Romance", "History", "Life"];
+
+  // Get or create a session ID
+  const getSessionId = (): string => {
+    if (typeof window === 'undefined') return 'default-session';
+    
+    let sessionId = localStorage.getItem('cartSessionId');
+    if (!sessionId) {
+      sessionId = 'session-' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('cartSessionId', sessionId);
+    }
+    return sessionId;
+  };
+
+  // Fetch cart from backend
+  const fetchCart = async () => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch cart');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setCart(result.data);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err: any) {
+      console.error('Error fetching cart:', err);
+      // Fallback to empty cart if API fails
+      setCart({
+        sessionId: getSessionId(),
+        items: [],
+        total: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    }
+  };
+
+  // Add to cart via API
+  const addToCartAPI = async (bookId: string) => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ bookId, quantity: 1 })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (data.success) {
+        setCart(result.data);
+        return true;
+      } else {
+        throw new Error(result.message || 'Failed to add to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart via API:', error);
+      return false;
+    }
+  };
+
+  // Update quantity via API
+  const updateQuantityAPI = async (bookId: string, newQuantity: number) => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/${bookId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: Math.max(1, newQuantity) }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update quantity');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setCart(result.data);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err: any) {
+      console.error('Error updating quantity:', err);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
+    }
+  };
+
+  // Remove from cart via API
+  const removeFromCartAPI = async (bookId: string) => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/${bookId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to remove from cart');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setCart(result.data);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err: any) {
+      console.error('Error removing item:', err);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
+    }
+  };
+
+  // Clear cart via API
+  const clearCartAPI = async () => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/clear`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to clear cart');
+      }
+      
+      const result = await response.json();
+      if (result.success) {
+        setCart(result.data);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err: any) {
+      console.error('Error clearing cart:', err);
+      // Re-fetch cart to ensure UI is in sync
+      fetchCart();
+    }
+  };
 
   // Fetch all books from API
   const fetchAllBooks = async () => {
@@ -216,62 +345,11 @@ export default function CategoriesPage() {
     }
   };
 
-  // Add book to cart 
-  const addToCartAPI = async (bookId: string, userId?: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/books/cart`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          bookId,
-          userId: userId || 'guest',
-          quantity: 1
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        console.log('Book added to cart via API:', data.data);
-        return data.data;
-      } else {
-        throw new Error(data.message || 'Failed to add to cart');
-      }
-    } catch (error) {
-      console.error('Error adding to cart via API:', error);
-      // Continue with local cart functionality
-      throw error;
-    }
-  };
-
-  // Load cart from localStorage on component mount
-  useEffect(() => {
-    const savedCart = localStorage.getItem('bookCart');
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart) as CartItem[];
-        setCart(parsedCart);
-      } catch (error) {
-        console.error("Failed to parse cart data", error);
-      }
-    }
-  }, []);
-
-  // Save cart to localStorage whenever cart changes
-  useEffect(() => {
-    localStorage.setItem('bookCart', JSON.stringify(cart));
-  }, [cart]);
-
   // Fetch initial data on component mount
   useEffect(() => {
     fetchAllBooks();
     fetchCategories();
+    fetchCart();
   }, []);
 
   // Handle search with debouncing
@@ -297,63 +375,24 @@ export default function CategoriesPage() {
     }
   };
 
-  // Add book to local cart
+  // Add book to cart
   const addToCart = async (book: Book) => {
-    // Try to add to API cart first, but continue with local cart regardless
-    try {
-      await addToCartAPI(book.id);
-    } catch (error) {
-      // API call failed, but we'll still add to local cart
-      console.log('API cart add failed, continuing with local cart');
-    }
-
-    // Add to local cart
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === book.id);
-      if (existingItem) {
-        return prevCart.map(item =>
-          item.id === book.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...prevCart, { ...book, quantity: 1 }];
-      }
-    });
-  };
-
-  // Remove book from cart
-  const removeFromCart = (bookId: string) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== bookId));
-  };
-
-  // Update quantity in cart
-  const updateQuantity = (bookId: string, newQuantity: number) => {
-    if (newQuantity === 0) {
-      removeFromCart(bookId);
-    } else {
-      setCart(prevCart =>
-        prevCart.map(item =>
-          item.id === bookId
-            ? { ...item, quantity: newQuantity }
-            : item
-        )
-      );
+    const success = await addToCartAPI(book.id);
+    if (!success) {
+      setError("Failed to add item to cart. Please try again.");
     }
   };
 
   // Get total cart items
   const getTotalItems = (): number => {
-    return cart.reduce((total, item) => total + item.quantity, 0);
+    if (!cart) return 0;
+    return cart.items.reduce((total, item) => total + item.quantity, 0);
   };
 
   // Get total cart price
   const getTotalPrice = (): string => {
-    return cart.reduce((total, item) => {
-      // Extract numeric price from price string like "K40000/$4.5"
-      const numericPrice = parseFloat(item.price.split('$')[1] || '0');
-      return total + (numericPrice * item.quantity);
-    }, 0).toFixed(2);
+    if (!cart) return "0.00";
+    return (cart.total / 100).toFixed(2); // Assuming price is stored in cents
   };
 
   // View PDF function
@@ -374,35 +413,36 @@ export default function CategoriesPage() {
               </button>
             </div>
             
-            {cart.length === 0 ? (
+            {!cart || cart.items.length === 0 ? (
               <p className="text-gray-500 text-center">Your cart is empty</p>
             ) : (
               <>
                 <div className="space-y-4 mb-6">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                  {cart.items.map((item) => (
+                    <div key={item.book.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                       <Image 
-                        src={item.image} 
-                        alt={item.title} 
+                        src={item.book.image} 
+                        alt={item.book.title} 
                         width={60} 
                         height={80} 
                         className="object-cover rounded" 
                       />
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm">{item.title}</h4>
-                        <p className="text-gray-600 text-xs">{item.author}</p>
-                        <p className="font-bold text-sm">${(parseFloat(item.price.split('$')[1] || '0') * item.quantity).toFixed(2)}</p>
+                        <h4 className="font-medium text-sm">{item.book.title}</h4>
+                        <p className="text-gray-600 text-xs">{item.book.author}</p>
+                        <p className="font-bold text-sm">${(parseFloat(item.book.price.split('$')[1] || '0') * item.quantity).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantityAPI(item.book.id, item.quantity - 1)}
                           className="p-1 bg-gray-200 rounded hover:bg-gray-300"
+                          disabled={item.quantity <= 1}
                         >
                           <Minus size={16} />
                         </button>
                         <span className="w-8 text-center">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantityAPI(item.book.id, item.quantity + 1)}
                           className="p-1 bg-gray-200 rounded hover:bg-gray-300"
                         >
                           <Plus size={16} />
@@ -418,6 +458,12 @@ export default function CategoriesPage() {
                   </div>
                   <button className="w-full bg-gray-900 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors">
                     Proceed to Checkout
+                  </button>
+                  <button 
+                    onClick={clearCartAPI}
+                    className="w-full mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                  >
+                    Clear Cart
                   </button>
                 </div>
               </>
@@ -446,12 +492,16 @@ export default function CategoriesPage() {
             {error && (
               <div className="text-red-600 text-sm bg-red-100 px-4 py-2 rounded">
                 {error}
+                <button onClick={() => setError("")} className="ml-2">✕</button>
               </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* Rest of your UI code remains the same */}
+      {/* ... (category buttons, search bar, book listings) ... */}
+      
       {/* Centered Category Buttons Section */}
       <div className="shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
