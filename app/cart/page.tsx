@@ -4,6 +4,273 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+// Define the Book interface (matching categories page)
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  publisher: string;
+  price: string; // Changed to string to match categories page format "K40000/$4.5"
+  image: string;
+  pdfUrl: string;
+  category?: string;
+}
+
+// Define Cart Item interface (matching categories page)
+interface CartItem extends Book {
+  quantity: number;
+}
+
+export default function ShopPage() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load cart from localStorage
+  const loadCartFromStorage = () => {
+    try {
+      setLoading(true);
+      const savedCart = localStorage.getItem('bookCart');
+      if (savedCart) {
+        const parsedCart = JSON.parse(savedCart) as CartItem[];
+        setCartItems(parsedCart);
+      } else {
+        setCartItems([]);
+      }
+    } catch (err: any) {
+      console.error('Error loading cart from localStorage:', err);
+      setError('Failed to load cart data');
+      setCartItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save cart to localStorage
+  const saveCartToStorage = (items: CartItem[]) => {
+    try {
+      localStorage.setItem('bookCart', JSON.stringify(items));
+    } catch (err) {
+      console.error('Error saving cart to localStorage:', err);
+      setError('Failed to save cart changes');
+    }
+  };
+
+  // Update quantity
+  const updateQuantity = (bookId: string, newQuantity: number) => {
+    const updatedItems = cartItems.map(item =>
+      item.id === bookId
+        ? { ...item, quantity: Math.max(1, newQuantity) }
+        : item
+    );
+    setCartItems(updatedItems);
+    saveCartToStorage(updatedItems);
+  };
+
+  // Remove from cart
+  const removeFromCart = (bookId: string) => {
+    const updatedItems = cartItems.filter(item => item.id !== bookId);
+    setCartItems(updatedItems);
+    saveCartToStorage(updatedItems);
+  };
+
+  // Clear cart
+  const clearCart = () => {
+    setCartItems([]);
+    saveCartToStorage([]);
+  };
+
+  // Calculate total price
+  const calculateTotal = (): number => {
+    return cartItems.reduce((total, item) => {
+      // Extract numeric price from price string like "K40000/$4.5"
+      const numericPrice = parseFloat(item.price.split('$')[1] || '0');
+      return total + (numericPrice * item.quantity);
+    }, 0);
+  };
+
+  // Calculate total items
+  const getTotalItems = (): number => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  // Load cart on component mount
+  useEffect(() => {
+    loadCartFromStorage();
+  }, []);
+
+  // Listen for storage changes (when cart is updated from other tabs/pages)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'bookCart') {
+        loadCartFromStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p>Loading cart...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl md:text-6xl lg:text-7xl text-center text-gray-900 font-semibold mb-4 md:mb-6 tracking-tight">
+        Your Cart
+      </h1>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+          <button 
+            onClick={() => setError(null)}
+            className="absolute top-0 right-0 p-2"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Books Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
+        {cartItems.map((item) => (
+          <div 
+            key={item.id}
+            className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+          >
+            <a 
+              href={item.pdfUrl} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="block mb-4"
+            >
+              <div className="relative overflow-hidden">
+                <Image 
+                  src={item.image} 
+                  alt={item.title}
+                  width={200}
+                  height={280}
+                  className="w-full h-48 md:h-56 object-cover transition-transform duration-300 hover:scale-105"
+                />
+              </div>
+            </a>
+            
+            <div className="space-y-2">
+              <h3 className="text-gray-900 font-semibold text-sm md:text-base line-clamp-2 leading-tight">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 text-xs md:text-sm">
+                <span className="font-medium">Author:</span> {item.author}
+              </p>
+              <p className="text-gray-600 text-xs md:text-sm">
+                <span className="font-medium">Publisher:</span> {item.publisher}
+              </p>
+              {item.category && (
+                <p className="text-gray-600 text-xs md:text-sm">
+                  <span className="font-medium">Category:</span> {item.category}
+                </p>
+              )}
+              <p className="text-gray-600 font-bold text-sm md:text-base">
+                {item.price}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4 mt-4">
+              <button 
+                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                disabled={item.quantity <= 1}
+              > 
+                - 
+              </button>
+              <span className="mx-2">Quantity: {item.quantity}</span>
+              <button 
+                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+              >
+                +
+              </button>      
+            </div>
+
+            <p className="text-lg font-semibold mb-4">
+              Total: ${(parseFloat(item.price.split('$')[1] || '0') * item.quantity).toFixed(2)}
+            </p>
+
+            <button 
+              onClick={() => removeFromCart(item.id)} 
+              className="bg-gray-900 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors duration-300 text-sm w-full"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Cart Summary - Only show if there are items */}
+      {cartItems.length > 0 && (
+        <div className="bg-gray-50 border rounded-xl p-6 max-w-md mx-auto shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Cart Summary</h2>
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Items:</span>
+              <span className="font-medium">{cartItems.length}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Total Quantity:</span>
+              <span className="font-medium">{getTotalItems()}</span>
+            </div>
+            <hr className="border-gray-300" />
+            <div className="flex justify-between items-center text-xl font-bold text-gray-900">
+              <span>Total:</span>
+              <span>${calculateTotal().toFixed(2)}</span>
+            </div>
+          </div>
+          <Link href="/payment">
+            <button 
+              className="w-full bg-gray-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Proceed to checkout"
+            >
+              Proceed to Checkout
+            </button>
+          </Link>
+          <button 
+            onClick={clearCart}
+            className="w-full mt-4 bg-yellow-700 hover:bg-gray-900 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Clear Cart
+          </button>
+        </div>
+      )}
+
+      {/* Empty cart message */}
+      {cartItems.length === 0 && !loading && (
+        <div className="text-center py-16">
+          <h2 className="text-2xl font-bold text-gray-600 mb-4">Your cart is empty</h2>
+          <p className="text-gray-500">Add some books to get started!</p>
+          <Link href="/books">
+            <Button className="mt-4">Browse Books</Button>
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+} 
+ 
+ 
+ 
+ {/*
+//'use client';
+import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 // Define the Book interface
 interface Book {
   id: number;
@@ -199,7 +466,7 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Books Grid */}
+      {/* Books Grid 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16">
         {cart && cart.items.map((item) => (
           <div 
@@ -269,7 +536,7 @@ export default function ShopPage() {
         ))}
       </div>
 
-      {/* Cart Summary - Only show if there are items */}
+       Cart Summary - Only show if there are items 
       {cart && cart.items.length > 0 && (
         <div className="bg-gray-50 border rounded-xl p-6 max-w-md mx-auto shadow-sm">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Cart Summary</h2>
@@ -307,7 +574,7 @@ export default function ShopPage() {
         </div>
       )}
 
-      {/* Empty cart message */}
+      {/* Empty cart message 
       {(!cart || cart.items.length === 0) && !loading && (
         <div className="text-center py-16">
           <h2 className="text-2xl font-bold text-gray-600 mb-4">Your cart is empty</h2>
@@ -320,3 +587,4 @@ export default function ShopPage() {
     </div>
   );
 }
+*/}
