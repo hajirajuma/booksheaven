@@ -23,6 +23,8 @@ interface CartItem extends Book {
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
+
+
 export default function ShopPage() {
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -34,74 +36,12 @@ export default function ShopPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<boolean>(false);
 
   // Static books data as fallback
-  const fallbackBooks: Book[] = [
-    {
-      id: 1,
-      title: "Data Analysis using SQL and Excel",
-      author: "Gordon S.Linoff",
-      publisher: "Wiley Publishing",
-      price: "K40000/$4.5",
-      numericPrice: 4.5,
-      image: "/books/data1.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 2,
-      title: "JavaScript: The Complete Guide",
-      author: "David Flanagan",
-      publisher: "O'Reilly Media",
-      price: "K30000/$3.8",
-      numericPrice: 3.8,
-      image: "/books/atom.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 3,
-      title: "Linear Algebra and Its Applications",
-      author: "David C. Lay",
-      publisher: "Pearson",
-      price: "K50000/$6.4",
-      numericPrice: 6.4,
-      image: "/books/java.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 4,
-      title: "Physics: Principles and Problems",
-      author: "Paul W. Zitzewitz",
-      publisher: "McGraw-Hill",
-      price: "K45000/$5.7",
-      numericPrice: 5.7,
-      image: "/books/phy.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 5,
-      title: "Java Programming Fundamentals",
-      author: "Oracle Press",
-      publisher: "McGraw-Hill",
-      price: "K35000/$4.4",
-      numericPrice: 4.4,
-      image: "/books/line.jpg",
-      pdfUrl: "/books/data.pdf"
-    },
-    {
-      id: 6,
-      title: "Atomic Structure and Chemical Bonding",
-      author: "Linus Pauling",
-      publisher: "Academic Press",
-      price: "K25000/$3.2",
-      numericPrice: 3.2,
-      image: "/books/stat.jpg",
-      pdfUrl: "/books/data.pdf"
-    }
-  ];
 
   // Fetch books from API
   const fetchBooks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/books`);
+      const response = await fetch(`${API_BASE_URL}/shop/books`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -111,7 +51,7 @@ export default function ShopPage() {
       
       if (data.success && Array.isArray(data.data)) {
         // Transform backend data to match frontend interface
-        const transformedBooks = data.data.map((book: any) => ({
+        const transformedBooks = data.data.map((book: Book) => ({
           ...book,
           price: book.price || `$${book.numericPrice}` // Ensure price string exists
         }));
@@ -122,7 +62,6 @@ export default function ShopPage() {
     } catch (error) {
       console.error('Error fetching books from API:', error);
       setError('Failed to load books from server. Using local data.');
-      setBooks(fallbackBooks);
     } finally {
       setLoading(false);
     }
@@ -137,7 +76,7 @@ export default function ShopPage() {
 
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}`);
+      const response = await fetch(`${API_BASE_URL}/shop/books/search?query=${encodeURIComponent(query)}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -156,12 +95,6 @@ export default function ShopPage() {
       }
     } catch (error) {
       console.error('Error searching books:', error);
-      // Fallback to client-side search
-      const filtered = fallbackBooks.filter(book =>
-        book.title.toLowerCase().includes(query.toLowerCase()) ||
-        book.author.toLowerCase().includes(query.toLowerCase())
-      );
-      setBooks(filtered);
     } finally {
       setLoading(false);
     }
@@ -177,7 +110,7 @@ export default function ShopPage() {
         quantity: item.quantity
       }));
 
-      const response = await fetch(`${API_BASE_URL}/orders`, {
+      const response = await fetch(`${API_BASE_URL}/shop/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -316,7 +249,7 @@ export default function ShopPage() {
     }
   };
 
-  return (
+return (
     <div className="min-h-screen bg-gray-50">
       {/* Cart Sidebar */}
       {showCart && (

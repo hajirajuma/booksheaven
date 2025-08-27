@@ -32,7 +32,7 @@ export default function CategoriesPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState<boolean>(false);
 
-  // Static fallback data
+  /*Static fallback data
   const fallbackBooks: Book[] = [
     {
       id: "1",
@@ -95,14 +95,14 @@ export default function CategoriesPage() {
       category: "Education"
     }
   ];
-
+*/
   const fallbackCategories = ["Education", "Technology", "Romance", "History", "Life"];
 
   // Fetch all books from API
   const fetchAllBooks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/books`);
+      const response = await fetch(`${API_BASE_URL}/shop/books`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -118,7 +118,7 @@ export default function CategoriesPage() {
     } catch (error) {
       console.error('Error fetching books from API:', error);
       setError('Failed to load books from server. Using local data.');
-      setBooks(fallbackBooks);
+      
     } finally {
       setLoading(false);
     }
@@ -165,11 +165,11 @@ export default function CategoriesPage() {
       }
     } catch (error) {
       console.error('Error fetching books by category:', error);
-      // Fallback to client-side filtering
+      /* Fallback to client-side filtering
       const filtered = fallbackBooks.filter(book => 
         book.category?.toLowerCase() === category.toLowerCase()
       );
-      setBooks(filtered);
+      setBooks(filtered);*/
     } finally {
       setLoading(false);
     }
@@ -203,14 +203,14 @@ export default function CategoriesPage() {
       }
     } catch (error) {
       console.error('Error searching books:', error);
-      // Fallback to client-side search
+      /* Fallback to client-side search
       const filtered = fallbackBooks.filter(book =>
         book.title.toLowerCase().includes(query.toLowerCase()) ||
         book.author.toLowerCase().includes(query.toLowerCase()) ||
         book.publisher.toLowerCase().includes(query.toLowerCase()) ||
         book.category?.toLowerCase().includes(query.toLowerCase())
       );
-      setBooks(filtered);
+      setBooks(filtered);*/
     } finally {
       setLoading(false);
     }
