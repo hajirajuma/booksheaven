@@ -9,7 +9,7 @@ module.exports = {
   images: {
     remotePatterns: [{
     protocol: 'https',
-    hostname: 'share.google',
+    hostname: "**",
   },],
   },
 }
