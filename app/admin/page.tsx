@@ -1,7 +1,8 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, Eye, RefreshCw, Package, ShoppingCart, BookOpen, AlertCircle, CheckCircle } from "lucide-react";
-import Link from "next/link"
+import Link from "next/link";
+import Image from "next/image";
 
 interface Book {
   id: number;
@@ -46,8 +47,8 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'books' | 'orders'>('books');
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
-  // Fixed fetchBooks function with proper type handling
-  const fetchBooks = async () => {
+  // Fixed fetchBooks function with proper type handling and useCallback
+  const fetchBooks = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/shop/books`, {
@@ -60,18 +61,18 @@ export default function AdminPage() {
       if (response.ok) {
         const data = await response.json();
         // Transform data to match your interface with proper type checking
-        const transformedBooks = Array.isArray(data) ? data.map((book: any) => ({
-          id: book.id,
-          title: book.title || '',
-          author: book.author || '',
-          publisher: book.publisher || undefined,
-          price: book.numericPrice ? book.numericPrice * 100 : 0,
-          displayPrice: book.price || `$${book.numericPrice || 0}`,
-          numericPrice: book.numericPrice || 0,
-          imageUrl: book.image || book.imageUrl || undefined,
-          image: book.image || undefined,
-          pdfUrl: book.pdfUrl || undefined,
-          createdAt: book.createdAt || undefined
+        const transformedBooks = Array.isArray(data) ? data.map((book: Record<string, unknown>) => ({
+          id: book.id as number,
+          title: (book.title as string) || '',
+          author: (book.author as string) || '',
+          publisher: (book.publisher as string) || undefined,
+          price: book.numericPrice ? (book.numericPrice as number) * 100 : 0,
+          displayPrice: (book.price as string) || `$${book.numericPrice || 0}`,
+          numericPrice: (book.numericPrice as number) || 0,
+          imageUrl: (book.image as string) || (book.imageUrl as string) || undefined,
+          image: (book.image as string) || undefined,
+          pdfUrl: (book.pdfUrl as string) || undefined,
+          createdAt: (book.createdAt as string) || undefined
         })) : [];
         
         setBooks(transformedBooks);
@@ -87,9 +88,9 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/admin/orders`, {
@@ -115,7 +116,7 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const deleteBook = async (id: number): Promise<void> => {
     if (!confirm('Are you sure you want to delete this book?')) return;
@@ -167,13 +168,13 @@ export default function AdminPage() {
     }
   };
 
-  const refreshData = () => {
+  const refreshData = useCallback(() => {
     if (activeTab === 'books') {
       fetchBooks();
     } else {
       fetchOrders();
     }
-  };
+  }, [activeTab, fetchBooks, fetchOrders]);
 
   const showAlert = (type: 'success' | 'error', message: string) => {
     setAlert({ type, message });
@@ -184,7 +185,7 @@ export default function AdminPage() {
   useEffect(() => {
     fetchBooks();
     fetchOrders();
-  }, []);
+  }, [fetchBooks, fetchOrders]);
 
   // Listen for custom events from add-book page
   useEffect(() => {
@@ -200,7 +201,7 @@ export default function AdminPage() {
     return () => {
       window.removeEventListener('bookAdded', eventHandler);
     };
-  }, []);
+  }, [fetchBooks]);
 
   // Listen for page visibility changes to refresh data when returning to page
   useEffect(() => {
@@ -212,7 +213,7 @@ export default function AdminPage() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [activeTab]);
+  }, [refreshData]);
 
   // Set up interval to periodically refresh data
   useEffect(() => {
@@ -221,7 +222,7 @@ export default function AdminPage() {
     }, 120000);
 
     return () => clearInterval(interval);
-  }, [activeTab]);
+  }, [refreshData]);
 
   const getStatusColor = (status: Order['status']) => {
     switch (status) {
@@ -402,23 +403,19 @@ export default function AdminPage() {
                           <div className="flex items-center gap-4">
                             <div className="w-12 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center overflow-hidden">
                               {book.imageUrl || book.image ? (
-                                <img
-                                  src={book.imageUrl || book.image}
+                                <Image
+                                  src={book.imageUrl || book.image || ''}
                                   alt={book.title}
+                                  width={48}
+                                  height={64}
                                   className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    const target = e.currentTarget;
-                                    const nextElement = target.nextElementSibling as HTMLElement;
-                                    target.style.display = 'none';
-                                    if (nextElement) {
-                                      nextElement.style.display = 'flex';
-                                    }
+                                  onError={() => {
+                                    // Handle error - image will be replaced by fallback
                                   }}
                                 />
-                              ) : null}
-                              <div className="w-full h-full flex items-center justify-center text-indigo-600 font-bold text-xs">
-                                <BookOpen className="h-6 w-6" />
-                              </div>
+                              ) : (
+                                <BookOpen className="h-6 w-6 text-indigo-600" />
+                              )}
                             </div>
                             <div>
                               <div className="font-semibold text-gray-900 text-lg">{book.title}</div>

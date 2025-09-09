@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, BookOpen, Save } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -193,7 +194,7 @@ window.dispatchEvent(new CustomEvent('bookAdded'));
                 <div className="flex gap-4">
                   <div className="w-16 h-20 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-lg flex items-center justify-center">
                     {formData.image ? (
-                      <img
+                      <Image
                         src={formData.image}
                         alt="Book preview"
                         className="w-full h-full object-cover rounded-lg"

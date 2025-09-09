@@ -56,12 +56,16 @@ export default function Home() {
 
   
    return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen ">
       {/* Hero Section */}
-      <div 
+              <div 
         className="relative bg-gradient-to-br bg-cover bg-center min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] flex items-center justify-center"
         style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/read.jpg')"
+    backgroundImage: "url('/image/read.jpg')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed' 
         }}
       >
         <div className="text-center py-8 md:py-16 lg:py-20 px-4 max-w-4xl mx-auto">
